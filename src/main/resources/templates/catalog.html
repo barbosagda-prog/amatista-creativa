@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Amatista Creativa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Nunito+Sans:wght@400;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+</head>
+<body>
+<nav>
+    <a th:href="@{/}">Todos</a>
+    <a th:href="@{/(category='Mugs')}">Mugs</a>
+    <a th:href="@{/(category='Camisas')}">Camisas</a>
+</nav>
+
+<main class="grid">
+    <article class="card" th:each="p : ${products}">
+        <h3 th:text="${p.name}">Nombre</h3>
+        <p th:text="${p.category}">Categoría</p>
+        <p class="price" th:text="'$' + ${#numbers.formatInteger(p.priceUnit, 0, 'POINT')}">$0</p>
+        <p th:if="${p.priceWholesale != null}"
+           th:text="'Por mayor: $' + ${#numbers.formatInteger(p.priceWholesale, 0, 'POINT')}"></p>
+        <button class="btn-buy">Agregar al carrito</button>
+    </article>
+</main>
+</body>
+</html>
