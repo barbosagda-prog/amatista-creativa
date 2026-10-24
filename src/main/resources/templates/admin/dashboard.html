@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Panel | Amatista Creativa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Nunito+Sans:wght@400;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+</head>
+<body>
+<nav>
+    <span>Panel de administración</span>
+    <a th:href="@{/}">Ver tienda</a>
+    <form th:action="@{/logout}" method="post" class="inline-form">
+        <button class="btn-buy" type="submit">Cerrar sesión</button>
+    </form>
+</nav>
+
+<main class="admin-main">
+    <h1>Hola, <span th:text="${username}">admin</span></h1>
+    <p>Aquí vivirán la gestión de productos (Fase 3) y los pedidos (Fase 6).</p>
+</main>
+</body>
+</html>
