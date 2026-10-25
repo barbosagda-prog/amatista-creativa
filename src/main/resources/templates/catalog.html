@@ -3,28 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Amatista Creativa</title>
+    <title>Amatista Creativa | Productos personalizados</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Nunito+Sans:wght@400;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/base.css}">
 </head>
 <body>
-<nav>
-    <a th:href="@{/}">Todos</a>
-    <a th:href="@{/(category='Mugs')}">Mugs</a>
-    <a th:href="@{/(category='Camisas')}">Camisas</a>
-    <a th:href="@{/login}">Administrador</a>
+
+<header class="site-header">
+    <a class="brand" th:href="@{/}">
+        <img th:src="@{/img/logo.png}" alt="" class="brand-logo" onerror="this.remove()">
+        <span>Amatista Creativa</span>
+    </a>
+    <a class="header-wa"
+       th:href="'https://wa.me/' + ${whatsapp}"
+       target="_blank" rel="noopener">WhatsApp</a>
+</header>
+
+<section class="hero">
+    <h1>Productos personalizados por sublimación</h1>
+    <p>Mugs, camisas, buzos, gorras, llaveros y más, con tu diseño.</p>
+    <div class="hero-actions">
+        <a class="btn-light" href="#catalogo">Ver catálogo</a>
+        <a class="btn-outline"
+           th:href="'https://wa.me/' + ${whatsapp} + '?text=' + ${#uris.escapeQueryParam('Hola, quiero más información sobre sus productos.')}"
+           target="_blank" rel="noopener">Escríbenos</a>
+    </div>
+</section>
+
+<nav class="chips" aria-label="Categorías">
+    <button type="button" class="chip active" data-cat="all">Todos</button>
+    <button type="button" class="chip" th:each="entry : ${grouped}"
+            th:data-cat="${entry.key}" th:text="${entry.key}">Categoría</button>
 </nav>
 
-<main class="grid">
-    <article class="card" th:each="p : ${products}">
-        <h3 th:text="${p.name}">Nombre</h3>
-        <p th:text="${p.category}">Categoría</p>
-        <p class="price" th:text="'$' + ${#numbers.formatInteger(p.priceUnit, 0, 'POINT')}">$0</p>
-        <p th:if="${p.priceWholesale != null}"
-           th:text="'Por mayor: $' + ${#numbers.formatInteger(p.priceWholesale, 0, 'POINT')}"></p>
-        <button class="btn-buy">Agregar al carrito</button>
-    </article>
+<main id="catalogo" class="catalog">
+    <section class="category-section" th:each="entry : ${grouped}" th:attr="data-cat=${entry.key}">
+        <h2 class="section-title" th:text="${entry.key}">Categoría</h2>
+
+        <div class="grid">
+            <article class="card product" th:each="p : ${entry.value}">
+
+                <div class="card-media">
+                    <span class="ph" aria-hidden="true">✦</span>
+                    <img th:if="${p.imageUrl != null}" th:src="@{${p.imageUrl}}" th:alt="${p.name}"
+                         loading="lazy" onerror="this.remove()">
+                </div>
+
+                <div class="card-body">
+                    <h3 th:text="${p.name}">Nombre</h3>
+                    <p class="desc" th:if="${p.description != null}" th:text="${p.description}">Descripción</p>
+
+                    <div class="prices">
+                        <span class="price" th:text="'$' + ${#numbers.formatInteger(p.priceUnit, 0, 'POINT')}">$0</span>
+                        <span class="price-note" th:text="${p.priceWholesale != null} ? 'unidad' : ''"></span>
+                    </div>
+                    <p class="price-w" th:if="${p.priceWholesale != null}"
+                       th:text="'Por mayor: $' + ${#numbers.formatInteger(p.priceWholesale, 0, 'POINT')}">Por mayor</p>
+
+                    <div class="swatches" th:if="${p.colors != null and !p.colors.isEmpty()}">
+              <span class="swatch" th:each="c : ${p.colors}"
+                    th:title="${c}"
+                    th:style="'background:' + ${colorHex.getOrDefault(c, '#cccccc')}"></span>
+                    </div>
+
+                    <div class="shapes" th:if="${p.shapes != null and !p.shapes.isEmpty()}">
+                        <span class="shape" th:each="s : ${p.shapes}" th:text="${s}">Forma</span>
+                    </div>
+
+                    <a class="btn-buy" target="_blank" rel="noopener"
+                       th:href="'https://wa.me/' + ${whatsapp} + '?text=' + ${#uris.escapeQueryParam('Hola, quiero pedir: ' + p.name)}">
+                        Pedir por WhatsApp
+                    </a>
+                </div>
+            </article>
+        </div>
+    </section>
 </main>
+
+<footer class="site-footer">
+    <p class="footer-brand">Amatista Creativa</p>
+    <p>WhatsApp: <a th:href="'https://wa.me/' + ${whatsapp}" target="_blank" rel="noopener">302 703 9254</a></p>
+    <p>TikTok · Facebook · Instagram: @Amatista.creativa</p>
+    <p class="footer-admin"><a th:href="@{/login}">Administrador</a></p>
+</footer>
+
+<script>
+    const chips = document.querySelectorAll('.chip');
+    const sections = document.querySelectorAll('.category-section');
+    chips.forEach(chip => chip.addEventListener('click', () => {
+        const cat = chip.dataset.cat;
+        chips.forEach(c => c.classList.toggle('active', c === chip));
+        sections.forEach(s => { s.hidden = cat !== 'all' && s.dataset.cat !== cat; });
+        document.getElementById('catalogo').scrollIntoView({ behavior: 'smooth' });
+    }));
+</script>
 </body>
 </html>
