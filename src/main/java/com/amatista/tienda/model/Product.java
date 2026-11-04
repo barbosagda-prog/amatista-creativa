@@ -29,6 +29,7 @@ public class Product {
 
     private List<String> colors;
     private List<String> shapes;
+    private List<String> sizes;
 
     private String imageUrl;
 

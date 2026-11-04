@@ -90,7 +90,13 @@ public class DataInitializer {
             );
 
             for (int i = 0; i < all.size(); i++) {
-                all.get(i).setPosition(i + 1);
+                Product x = all.get(i);
+                x.setPosition(i + 1);
+                switch (x.getCategory()) {
+                    case "Camisas", "Buzos" -> x.setSizes(TALLAS_ROPA);
+                    case "Gorras" -> x.setSizes(TALLAS_GORRA);
+                    default -> { }
+                }
             }
             repo.saveAll(all);
         };
@@ -114,4 +120,6 @@ public class DataInitializer {
         String n = Normalizer.normalize(text, Normalizer.Form.NFD).replaceAll("\\p{M}", "");
         return n.toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("(^-|-$)", "");
     }
+    private static final List<String> TALLAS_ROPA = List.of("S", "M", "L", "XL");
+    private static final List<String> TALLAS_GORRA = List.of("S/M", "L/XL");
 }

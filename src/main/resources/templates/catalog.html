@@ -8,16 +8,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Nunito+Sans:wght@400;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/base.css}">
 </head>
-<body>
+<body th:attr="data-wa=${whatsapp}">
 
 <header class="site-header">
     <a class="brand" th:href="@{/}">
         <img th:src="@{/img/logo.png}" alt="" class="brand-logo" onerror="this.remove()">
         <span>Amatista Creativa</span>
     </a>
-    <a class="header-wa"
-       th:href="'https://wa.me/' + ${whatsapp}"
-       target="_blank" rel="noopener">WhatsApp</a>
+    <div class="header-actions">
+        <a class="header-wa" th:href="'https://wa.me/' + ${whatsapp}"
+           target="_blank" rel="noopener">WhatsApp</a>
+        <button id="abrir-carrito" class="cart-btn" type="button">Carrito <b>00</b></button>
+    </div>
 </header>
 
 <section class="hero">
@@ -42,7 +44,8 @@
         <h2 class="section-title" th:text="${entry.key}">Categoría</h2>
 
         <div class="grid">
-            <article class="card product" th:each="p : ${entry.value}">
+            <article class="card product" th:each="p : ${entry.value}"
+                     th:attr="data-id=${p.id},data-nombre=${p.name},data-precio=${p.priceUnit}">
 
                 <div class="card-media">
                     <span class="ph" aria-hidden="true">✦</span>
@@ -62,24 +65,53 @@
                        th:text="'Por mayor: $' + ${#numbers.formatInteger(p.priceWholesale, 0, 'POINT')}">Por mayor</p>
 
                     <div class="swatches" th:if="${p.colors != null and !p.colors.isEmpty()}">
-              <span class="swatch" th:each="c : ${p.colors}"
-                    th:title="${c}"
-                    th:style="'background:' + ${colorHex.getOrDefault(c, '#cccccc')}"></span>
+                        <span class="opt-label">Color: <strong class="color-name">elige uno</strong></span>
+                        <div class="swatch-list">
+                            <button type="button" class="swatch" aria-pressed="false"
+                                    th:each="c : ${p.colors}"
+                                    th:title="${c}"
+                                    th:attr="aria-label=${c},data-color=${c}"
+                                    th:style="'background:' + ${colorHex.getOrDefault(c, '#cccccc')}"></button>
+                        </div>
                     </div>
 
                     <div class="shapes" th:if="${p.shapes != null and !p.shapes.isEmpty()}">
                         <span class="shape" th:each="s : ${p.shapes}" th:text="${s}">Forma</span>
                     </div>
 
-                    <a class="btn-buy" target="_blank" rel="noopener"
-                       th:href="'https://wa.me/' + ${whatsapp} + '?text=' + ${#uris.escapeQueryParam('Hola, quiero pedir: ' + p.name)}">
-                        Pedir por WhatsApp
-                    </a>
+                    <div class="sizes" th:if="${p.sizes != null and !p.sizes.isEmpty()}">
+                        <span class="sizes-label">Talla:</span>
+                        <button type="button" class="size-btn" aria-pressed="false"
+                                th:each="s : ${p.sizes}" th:text="${s}">M</button>
+                    </div>
+
+                    <p class="opt-msg" hidden></p>
+
+                    <div class="card-actions">
+                        <button type="button" class="btn-buy add-btn">Agregar al carrito</button>
+                        <a class="btn-wa order-btn" target="_blank" rel="noopener"
+                           th:href="'https://wa.me/' + ${whatsapp}">Pedir por WhatsApp</a>
+                    </div>
                 </div>
             </article>
         </div>
     </section>
 </main>
+
+<div id="overlay" hidden></div>
+<aside id="mini-carrito" class="drawer" hidden aria-label="Carrito de compras">
+    <div class="drawer-head">
+        <h2>Tu carrito</h2>
+        <button id="cerrar-carrito" type="button" aria-label="Cerrar carrito">✕</button>
+    </div>
+    <ul id="lista-carrito"></ul>
+    <p id="carrito-vacio" class="empty">Tu carrito está vacío.</p>
+    <div class="drawer-foot">
+        <p>Total: <strong id="total">$ 0</strong></p>
+        <a id="ir-pagar" class="btn-buy" href="#" target="_blank" rel="noopener">Finalizar pedido</a>
+        <button id="vaciar" type="button" class="btn-ghost">Vaciar carrito</button>
+    </div>
+</aside>
 
 <footer class="site-footer">
     <p class="footer-brand">Amatista Creativa</p>
@@ -88,15 +120,6 @@
     <p class="footer-admin"><a th:href="@{/login}">Administrador</a></p>
 </footer>
 
-<script>
-    const chips = document.querySelectorAll('.chip');
-    const sections = document.querySelectorAll('.category-section');
-    chips.forEach(chip => chip.addEventListener('click', () => {
-        const cat = chip.dataset.cat;
-        chips.forEach(c => c.classList.toggle('active', c === chip));
-        sections.forEach(s => { s.hidden = cat !== 'all' && s.dataset.cat !== cat; });
-        document.getElementById('catalogo').scrollIntoView({ behavior: 'smooth' });
-    }));
-</script>
+<script th:src="@{/js/app.js}"></script>
 </body>
 </html>
