@@ -11,6 +11,8 @@
 <body>
 <nav>
     <span>Panel de administración</span>
+    <a th:href="@{/admin}">Inicio</a>
+    <a th:href="@{/admin/products}">Productos</a>
     <a th:href="@{/}">Ver tienda</a>
     <form th:action="@{/logout}" method="post" class="inline-form">
         <button class="btn-buy" type="submit">Cerrar sesión</button>

@@ -5,6 +5,15 @@ const pesos = new Intl.NumberFormat("es-CO", {
     maximumFractionDigits: 0,
 });
 
+function on(selector, evento, fn) {
+    const el = document.querySelector(selector);
+    if (!el) {
+        console.warn("Falta el elemento", selector);
+        return;
+    }
+    el.addEventListener(evento, fn);
+}
+
 // ---------- Filtros por categoría ----------
 const chips = document.querySelectorAll(".chip");
 const secciones = document.querySelectorAll(".category-section");
@@ -80,6 +89,7 @@ function crearBoton(texto, key, delta) {
 
 function renderLista() {
     const ul = document.querySelector("#lista-carrito");
+    if (!ul) return;
     ul.replaceChildren();
 
     carrito.forEach((p) => {
@@ -111,29 +121,25 @@ function renderLista() {
 function actualizar() {
     guardar();
     const unidades = carrito.reduce((n, p) => n + p.cantidad, 0);
-    document.querySelector(".cart-btn b").textContent =
-        String(unidades).padStart(2, "0");
-    document.querySelector("#carrito-vacio").hidden = carrito.length > 0;
-    document.querySelector("#total").textContent = pesos.format(totalCarrito());
+
+    const contador = document.querySelector(".cart-btn b");
+    if (contador) contador.textContent = String(unidades).padStart(2, "0");
+
+    const vacio = document.querySelector("#carrito-vacio");
+    if (vacio) vacio.hidden = carrito.length > 0;
+
+    const total = document.querySelector("#total");
+    if (total) total.textContent = pesos.format(totalCarrito());
+
     renderLista();
 }
 
-function on(selector, evento, fn) {
-    const el = document.querySelector(selector);
-    if (!el) {
-        console.warn("Falta el elemento", selector);
-        return;
-    }
-    el.addEventListener(evento, fn);
-}
-
 // ---------- Abrir y cerrar el panel ----------
-const panel = document.querySelector("#mini-carrito");
-const fondo = document.querySelector("#overlay");
-
 function mostrarPanel(visible) {
-    panel.hidden = !visible;
-    fondo.hidden = !visible;
+    const panel = document.querySelector("#mini-carrito");
+    const fondo = document.querySelector("#overlay");
+    if (panel) panel.hidden = !visible;
+    if (fondo) fondo.hidden = !visible;
 }
 
 on("#abrir-carrito", "click", () => mostrarPanel(true));
@@ -154,21 +160,8 @@ on("#vaciar", "click", () => {
     actualizar();
 });
 
-// ---------- Resumen por WhatsApp ----------
 on("#ir-pagar", "click", (e) => {
-    if (carrito.length === 0) {
-        e.preventDefault();
-        return;
-    }
-    const lineas = carrito.map((p) => {
-        const extras = [p.color, p.talla && "Talla " + p.talla].filter(Boolean).join(", ");
-        return "- " + p.nombre + (extras ? " (" + extras + ")" : "") +
-            " x" + p.cantidad + " = " + pesos.format(p.precio * p.cantidad);
-    });
-    const texto = "Hola, quiero hacer este pedido:\n" + lineas.join("\n") +
-        "\nTotal: " + pesos.format(totalCarrito());
-    e.currentTarget.href = "https://wa.me/" + document.body.dataset.wa +
-        "?text=" + encodeURIComponent(texto);
+    if (carrito.length === 0) e.preventDefault();
 });
 
 // ---------- Opciones de cada tarjeta ----------
@@ -192,63 +185,61 @@ function leerOpciones(card) {
     };
 }
 
-catalogo.addEventListener("click", (e) => {
-    const card = e.target.closest(".card");
-    if (!card) return;
-    const aviso = card.querySelector(".opt-msg");
+if (catalogo) {
+    catalogo.addEventListener("click", (e) => {
+        const card = e.target.closest(".card");
+        if (!card) return;
+        const aviso = card.querySelector(".opt-msg");
 
-    // Elegir color
-    const color = e.target.closest(".swatch");
-    if (color) {
-        card.querySelectorAll(".swatch").forEach((b) => {
-            b.setAttribute("aria-pressed", String(b === color));
-        });
-        card.querySelector(".color-name").textContent = color.dataset.color;
-        aviso.hidden = true;
-        return;
-    }
-
-    // Elegir talla
-    const talla = e.target.closest(".size-btn");
-    if (talla) {
-        card.querySelectorAll(".size-btn").forEach((b) => {
-            b.setAttribute("aria-pressed", String(b === talla));
-        });
-        aviso.hidden = true;
-        return;
-    }
-
-    // Agregar al carrito
-    const agregarBtn = e.target.closest(".add-btn");
-    if (agregarBtn) {
-        const opciones = leerOpciones(card);
-        if (!opciones) return;
-        agregar({
-            id: card.dataset.id,
-            nombre: card.dataset.nombre,
-            precio: Number(card.dataset.precio),
-            ...opciones,
-        });
-        agregarBtn.textContent = "Agregado ✓";
-        setTimeout(() => { agregarBtn.textContent = "Agregar al carrito"; }, 1200);
-        return;
-    }
-
-    // Pedir este producto por WhatsApp
-    const pedir = e.target.closest(".order-btn");
-    if (pedir) {
-        const opciones = leerOpciones(card);
-        if (!opciones) {
-            e.preventDefault();
+        const color = e.target.closest(".swatch");
+        if (color) {
+            card.querySelectorAll(".swatch").forEach((b) => {
+                b.setAttribute("aria-pressed", String(b === color));
+            });
+            card.querySelector(".color-name").textContent = color.dataset.color;
+            aviso.hidden = true;
             return;
         }
-        let texto = "Hola, quiero pedir: " + card.dataset.nombre;
-        if (opciones.color) texto += " - Color " + opciones.color;
-        if (opciones.talla) texto += " - Talla " + opciones.talla;
-        pedir.href = "https://wa.me/" + document.body.dataset.wa +
-            "?text=" + encodeURIComponent(texto);
-    }
-});
+
+        const talla = e.target.closest(".size-btn");
+        if (talla) {
+            card.querySelectorAll(".size-btn").forEach((b) => {
+                b.setAttribute("aria-pressed", String(b === talla));
+            });
+            aviso.hidden = true;
+            return;
+        }
+
+        const agregarBtn = e.target.closest(".add-btn");
+        if (agregarBtn) {
+            const opciones = leerOpciones(card);
+            if (!opciones) return;
+            agregar({
+                id: card.dataset.id,
+                nombre: card.dataset.nombre,
+                precio: Number(card.dataset.precio),
+                ...opciones,
+            });
+            agregarBtn.textContent = "Agregado ✓";
+            setTimeout(() => { agregarBtn.textContent = "Agregar al carrito"; }, 1200);
+            return;
+        }
+
+        const pedir = e.target.closest(".order-btn");
+        if (pedir) {
+            const opciones = leerOpciones(card);
+            if (!opciones) {
+                e.preventDefault();
+                return;
+            }
+            let texto = "Hola, quiero pedir: " + card.dataset.nombre;
+            if (opciones.color) texto += " - Color " + opciones.color;
+            if (opciones.talla) texto += " - Talla " + opciones.talla;
+            pedir.href = "https://wa.me/" + document.body.dataset.wa +
+                "?text=" + encodeURIComponent(texto);
+        }
+    });
+}
 
 // ---------- Al cargar ----------
-actualizar();
+actualizar()

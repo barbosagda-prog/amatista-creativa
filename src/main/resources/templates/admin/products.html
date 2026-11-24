@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Productos | Amatista Creativa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Nunito+Sans:wght@400;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+</head>
+<body>
+<nav>
+    <span>Panel de administración</span>
+    <a th:href="@{/admin}">Inicio</a>
+    <a th:href="@{/admin/products}">Productos</a>
+    <a th:href="@{/}">Ver tienda</a>
+    <form th:action="@{/logout}" method="post" class="inline-form">
+        <button class="btn-buy" type="submit">Cerrar sesión</button>
+    </form>
+</nav>
+
+<main class="admin-main">
+    <div class="admin-bar">
+        <h1>Productos</h1>
+        <a class="btn-buy btn-link" th:href="@{/admin/products/new}">+ Nuevo producto</a>
+    </div>
+
+    <p class="msg msg-ok" th:if="${ok}" th:text="${ok}"></p>
+
+    <div class="table-wrap">
+        <table class="admin-table">
+            <thead>
+            <tr>
+                <th>Foto</th><th>Nombre</th><th>Categoría</th>
+                <th>Precio</th><th>Por mayor</th><th>Estado</th><th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${products}">
+                <td>
+                    <img th:if="${p.imageUrl != null}" th:src="@{${p.imageUrl}}"
+                         class="thumb" alt="" onerror="this.remove()">
+                </td>
+                <td th:text="${p.name}">Nombre</td>
+                <td th:text="${p.category}">Categoría</td>
+                <td th:text="'$' + ${#numbers.formatInteger(p.priceUnit, 0, 'POINT')}">$0</td>
+                <td th:text="${p.priceWholesale != null} ? ('$' + ${#numbers.formatInteger(p.priceWholesale, 0, 'POINT')}) : '—'">—</td>
+                <td>
+              <span class="badge" th:classappend="${p.active} ? 'on' : 'off'"
+                    th:text="${p.active} ? 'Visible' : 'Oculto'">Visible</span>
+                </td>
+                <td class="actions">
+                    <a th:href="@{/admin/products/{id}/edit(id=${p.id})}">Editar</a>
+                    <form th:action="@{/admin/products/{id}/toggle(id=${p.id})}" method="post" class="inline-form">
+                        <button type="submit" class="link-btn" th:text="${p.active} ? 'Ocultar' : 'Mostrar'">Ocultar</button>
+                    </form>
+                    <form th:action="@{/admin/products/{id}/delete(id=${p.id})}" method="post" class="inline-form"
+                          onsubmit="return confirm('¿Eliminar este producto? No se puede deshacer.')">
+                        <button type="submit" class="link-btn danger">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

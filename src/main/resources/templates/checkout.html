@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <title>Finalizar pedido | Amatista Creativa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Nunito+Sans:wght@400;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+</head>
+<body th:attr="data-wa=${whatsapp}">
+
+<header class="site-header">
+    <a class="brand" th:href="@{/}"><span>Amatista Creativa</span></a>
+    <a class="header-wa" th:href="@{/}">← Seguir comprando</a>
+</header>
+
+<main class="checkout">
+
+    <div id="checkout-contenido" class="checkout-grid">
+        <form id="form-pedido" class="form-card">
+            <h1>Datos de contacto y envío</h1>
+
+            <label for="name">Nombre completo</label>
+            <input id="name" name="name" type="text" maxlength="100" required autocomplete="name">
+
+            <label for="phone">Celular</label>
+            <input id="phone" name="phone" type="tel" pattern="[0-9+ ]{7,15}" required autocomplete="tel">
+
+            <label for="email">Correo electrónico</label>
+            <input id="email" name="email" type="email" maxlength="120" required autocomplete="email">
+
+            <label for="city">Ciudad</label>
+            <input id="city" name="city" type="text" maxlength="80" required>
+
+            <label for="address">Dirección de envío</label>
+            <input id="address" name="address" type="text" maxlength="160" required autocomplete="street-address">
+
+            <label for="notes">Notas del pedido (opcional)</label>
+            <textarea id="notes" name="notes" rows="3" maxlength="300"></textarea>
+
+            <p class="msg msg-error" id="form-msg" hidden></p>
+            <button id="btn-enviar" class="btn-buy" type="submit">Confirmar pedido</button>
+        </form>
+
+        <aside class="form-card">
+            <h2>Resumen</h2>
+            <ul id="resumen-lista" class="summary-list"></ul>
+            <p id="resumen-vacio" class="empty" hidden>
+                Tu carrito está vacío. <a th:href="@{/}">Volver a la tienda</a>
+            </p>
+            <p class="summary-total">Total productos: <strong id="resumen-total">$ 0</strong></p>
+            <p class="summary-note">El costo de envío y el pago se confirman por WhatsApp.</p>
+        </aside>
+    </div>
+
+    <section id="confirmacion" class="form-card" hidden>
+        <h1>Pedido recibido</h1>
+        <p>Tu número de pedido es <strong id="conf-codigo"></strong>.</p>
+        <p>Total de productos: <strong id="conf-total"></strong>.</p>
+        <p>Confirmamos el envío y el pago por WhatsApp.</p>
+        <a id="conf-wa" class="btn-buy" target="_blank" rel="noopener" href="#">Confirmar por WhatsApp</a>
+        <a th:href="@{/}">Volver a la tienda</a>
+    </section>
+
+</main>
+
+<script th:src="@{/js/checkout.js}"></script>
+</body>
+</html>

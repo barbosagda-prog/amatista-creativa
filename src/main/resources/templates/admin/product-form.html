@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Producto | Amatista Creativa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Nunito+Sans:wght@400;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+</head>
+<body>
+<nav>
+    <span>Panel de administración</span>
+    <a th:href="@{/admin}">Inicio</a>
+    <a th:href="@{/admin/products}">Productos</a>
+    <a th:href="@{/}">Ver tienda</a>
+    <form th:action="@{/logout}" method="post" class="inline-form">
+        <button class="btn-buy" type="submit">Cerrar sesión</button>
+    </form>
+</nav>
+
+<main class="admin-main">
+    <form class="form-card admin-form" th:action="@{${action}}" th:object="${form}"
+          method="post" enctype="multipart/form-data">
+        <h1 th:text="${title}">Producto</h1>
+
+        <label for="name">Nombre</label>
+        <input id="name" type="text" th:field="*{name}" maxlength="120" required>
+        <p class="msg msg-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+
+        <label for="category">Categoría</label>
+        <input id="category" type="text" th:field="*{category}" list="categorias" maxlength="60" required>
+        <datalist id="categorias">
+            <option th:each="c : ${categories}" th:value="${c}"></option>
+        </datalist>
+        <p class="hint">Elige una existente o escribe una nueva.</p>
+        <p class="msg msg-error" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></p>
+
+        <label for="description">Descripción</label>
+        <textarea id="description" th:field="*{description}" rows="3" maxlength="300"></textarea>
+        <p class="msg msg-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></p>
+
+        <label for="priceUnit">Precio unitario (COP)</label>
+        <input id="priceUnit" type="number" min="1" step="1" th:field="*{priceUnit}" required>
+        <p class="msg msg-error" th:if="${#fields.hasErrors('priceUnit')}" th:errors="*{priceUnit}"></p>
+
+        <label for="priceWholesale">Precio por mayor (COP, opcional)</label>
+        <input id="priceWholesale" type="number" min="1" step="1" th:field="*{priceWholesale}">
+        <p class="msg msg-error" th:if="${#fields.hasErrors('priceWholesale')}" th:errors="*{priceWholesale}"></p>
+
+        <label for="colors">Colores (separados por coma)</label>
+        <input id="colors" type="text" th:field="*{colors}" maxlength="300">
+        <p class="hint">Nombres que reconoce el catálogo: Rojo, Azul, Amarillo, Verde, Verde claro, Verde oliva, Verde oscuro, Verde militar, Negro, Naranja, Azul oscuro, Rosado, Celeste, Lila, Amarillo lima, Blanco. Otro nombre se muestra en gris.</p>
+
+        <label for="shapes">Formas (separadas por coma)</label>
+        <input id="shapes" type="text" th:field="*{shapes}" maxlength="300">
+
+        <label for="sizes">Tallas (separadas por coma)</label>
+        <input id="sizes" type="text" th:field="*{sizes}" maxlength="100">
+        <p class="hint">Ejemplo: S, M, L, XL. Si lo dejas vacío, el producto no pide talla.</p>
+
+        <label for="image">Foto (JPG, PNG o WEBP, máximo 3 MB)</label>
+        <img th:if="${currentImage != null}" th:src="@{${currentImage}}" class="thumb-lg" alt="Foto actual"
+             onerror="this.remove()">
+        <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp">
+        <p class="msg msg-error" th:if="${#fields.hasErrors('image')}" th:errors="*{image}"></p>
+
+        <label class="check">
+            <input type="checkbox" th:field="*{active}"> Visible en la tienda
+        </label>
+
+        <button class="btn-buy" type="submit">Guardar</button>
+        <a th:href="@{/admin/products}">Cancelar</a>
+    </form>
+</main>
+</body>
+</html>
