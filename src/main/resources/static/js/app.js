@@ -242,4 +242,4 @@ if (catalogo) {
 }
 
 // ---------- Al cargar ----------
-actualizar();
+actualizar()
